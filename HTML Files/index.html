@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>B2B Stock Sync Platform</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            margin: 0;
+            background: #f4f6f9;
+        }
+
+        /* Header */
+
+        header {
+            background: #111827;
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        /* Layout */
+
+        .container {
+            width: 90%;
+            margin: auto;
+            margin-top: 20px;
+        }
+
+        /* Tabs */
+
+        .tabs {
+            margin-bottom: 22px;
+        }
+
+        .tabs button {
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            background: #ddd;
+            margin-right: 10px;
+            border-radius: 5px;
+        }
+
+        .tabs button.active {
+            background: #111827;
+            color: white;
+        }
+
+        /* Card */
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Upload */
+
+        .upload {
+            border: 2px dashed #ccc;
+            padding: 40px;
+            text-align: center;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .upload:hover {
+            border-color: #111827;
+        }
+
+        /* Button */
+
+        button.main {
+            background: #2563eb;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        /* Table */
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f9fafb;
+        }
+
+        /* Stock Status */
+
+        .instock {
+            color: green;
+            font-weight: bold;
+        }
+
+        .lowstock {
+            color: orange;
+            font-weight: bold;
+        }
+
+        .outstock {
+            color: red;
+            font-weight: bold;
+        }
+
+        /* Notification */
+
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #22c55e;
+            color: white;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="logo">B2B Stock Sync</div>
+        <div>Admin Panel</div>
+    </header>
+
+    <div class="container">
+
+        <div class="tabs">
+            <button class="active" onclick="showTab('admin')">Admin Upload</button>
+            <button onclick="showTab('customer')">Customer Stock</button>
+        </div>
+
+        <!-- ADMIN -->
+
+        <div id="admin" class="card">
+
+            <h2>Upload Product File</h2>
+
+            <div class="upload">
+                <p>Upload The product image and additional details</p>
+
+                <input type="file" id="file">
+
+                <br>
+
+                <button class="main" onclick="upload()">Sync Stock</button>
+
+            </div>
+
+            <h3>Activity</h3>
+
+            <ul id="log"></ul>
+
+        </div>
+
+        <!-- CUSTOMER -->
+
+        <div id="customer" class="card" style="display:none">
+
+            <h2>Live Stock Sheet</h2>
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>SKU</th>
+                        <th>Product</th>
+                        <th>Category</th>
+                        <th>Price</th>
+                        <th>Stock</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody id="table">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <div class="notification" id="notify">
+        Stock Updated Successfully
+    </div>
+
+    <script>
+
+        /* Data */
+
+        let data = [
+
+            { sku: "P14", name: "ARCTIC P14 Fan", cat: "Cooling", price: 9, stock: 150 },
+
+            { sku: "P12", name: "ARCTIC P12 Fan", cat: "Cooling", price: 7, stock: 20 },
+
+            { sku: "AIO360", name: "Liquid Freezer III", cat: "Cooling", price: 120, stock: 5 }
+
+        ];
+
+        /* Render table */
+
+        function render() {
+
+            let table = document.getElementById("table");
+
+            table.innerHTML = "";
+
+            data.forEach(p => {
+
+                let status = "instock";
+                let text = "In Stock";
+
+                if (p.stock < 20) {
+                    status = "lowstock";
+                    text = "Low Stock";
+                }
+
+                if (p.stock == 0) {
+                    status = "outstock";
+                    text = "Out of Stock";
+                }
+
+                table.innerHTML += `
+
+<tr>
+
+<td>${p.sku}</td>
+
+<td>${p.name}</td>
+
+<td>${p.cat}</td>
+
+<td>$${p.price}</td>
+
+<td>${p.stock}</td>
+
+<td class="${status}">${text}</td>
+
+</tr>
+
+`;
+
+            });
+
+        }
+
+        /* Upload Simulation */
+
+        function upload() {
+
+            let file = document.getElementById("file");
+
+            if (file.files.length == 0) {
+
+                alert("Upload a file");
+
+                return;
+
+            }
+
+            /* Simulate new stock */
+
+            data.push({
+
+                sku: "NEW1",
+
+                name: "New Product",
+
+                cat: "Electronics",
+
+                price: 55,
+
+                stock: 300
+
+            });
+
+            render();
+
+            log("File uploaded: " + file.files[0].name);
+
+            notify();
+
+        }
+
+        /* Log */
+
+        function log(text) {
+
+            let list = document.getElementById("log");
+
+            let li = document.createElement("li");
+
+            li.innerText = text;
+
+            list.prepend(li);
+
+        }
+
+        /* Notification */
+
+        function notify() {
+
+            let n = document.getElementById("notify");
+
+            n.style.display = "block";
+
+            setTimeout(() => {
+
+                n.style.display = "none";
+
+            }, 3000);
+
+        }
+
+        /* Tabs */
+
+        function showTab(tab) {
+
+            document.getElementById("admin").style.display = "none";
+
+            document.getElementById("customer").style.display = "none";
+
+            document.getElementById(tab).style.display = "block";
+
+        }
+
+        /* Start */
+
+        render();
+
+    </script>
+
+</body>
+
+</html>
