@@ -57,6 +57,16 @@ export interface SellerUser {
   password?: string
 }
 
+export interface ClientBalance {
+  id: string
+  name: string
+  email: string
+  phone: string
+  balance: number
+  status: 'Active' | 'Inactive' | 'Suspended'
+  lastUpdated: string
+}
+
 export interface AuthUser {
   id: string
   name: string

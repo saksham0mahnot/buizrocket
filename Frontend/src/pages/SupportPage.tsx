@@ -1,119 +1,128 @@
-import { useState } from 'react'
-import { MessageSquare, Send, Mail, Phone, Clock, CheckCircle } from 'lucide-react'
+import { Mail, MessageSquare, Phone, FileText, ExternalLink, Send } from 'lucide-react'
 import { TopNavbar } from '../components/layout/TopNavbar'
 import { Button } from '../components/ui/Button'
-import { Input, Textarea, Select } from '../components/ui/Input'
+import { Input, Textarea } from '../components/ui/Input'
 import toast from 'react-hot-toast'
 
-const faqs = [
-  { q: 'How do I update my product price?', a: 'Go to Items → find the product → click the edit (pencil) icon → update the price field → Save Changes.' },
-  { q: 'How long does order processing take?', a: 'Orders should be confirmed and dispatched within 2 business days of placement.' },
-  { q: 'How do I get my GST approved?', a: 'Submit your GSTIN during registration. Our compliance team reviews and approves within 24-48 hours.' },
-  { q: 'Can I bulk upload products?', a: 'Bulk upload via CSV is coming soon. Currently, products can be added one at a time via the Items page.' },
-  { q: 'How are payouts processed?', a: 'Payouts are processed every 7 days to your registered bank account after order delivery confirmation.' },
-]
-
-const categoryOptions = [
-  { value: 'orders', label: 'Orders & Shipping' },
-  { value: 'products', label: 'Products & Catalog' },
-  { value: 'payments', label: 'Payments & Payouts' },
-  { value: 'technical', label: 'Technical Issue' },
-  { value: 'other', label: 'Other' },
-]
-
 export function SupportPage() {
-  const [form, setForm] = useState({ subject: '', category: '', message: '' })
-  const [submitted, setSubmitted] = useState(false)
-  const [openFaq, setOpenFaq] = useState<number | null>(null)
-  const [loading, setLoading] = useState(false)
-
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleTicketSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    if (!form.subject || !form.category || !form.message) {
-      toast.error('Please fill all fields'); return
-    }
-    setLoading(true)
-    await new Promise((r) => setTimeout(r, 1200))
-    setLoading(false); setSubmitted(true)
-    toast.success('Ticket submitted! We\'ll respond within 24 hours.')
+    toast.success('Your ticket has been submitted. We will get back to you soon.')
+    ;(e.target as HTMLFormElement).reset()
   }
 
   return (
-    <div className="flex flex-col h-full overflow-hidden">
-      <TopNavbar title="Support & Feedback" subtitle="We're here to help you succeed" />
-      <div className="flex-1 overflow-y-auto p-6 scrollbar-thin animate-fade-in space-y-6">
-        {/* Contact options */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {[
-            { icon: Mail, label: 'Email Support', value: 'support@buizrocket.com', color: 'text-blue-500 bg-blue-50 dark:bg-blue-400/10' },
-            { icon: Phone, label: 'Phone Support', value: '+91 1800-123-4567', color: 'text-emerald-500 bg-emerald-50 dark:bg-emerald-400/10' },
-            { icon: Clock, label: 'Response Time', value: 'Within 24 hours', color: 'text-amber-500 bg-amber-50 dark:bg-amber-400/10' },
-          ].map(({ icon: Icon, label, value, color }) => (
-            <div key={label} className="flex items-center gap-3 p-4 rounded-xl border border-gray-200 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/80">
-              <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${color}`}>
-                <Icon size={16} />
-              </div>
-              <div>
-                <p className="text-xs text-gray-400 dark:text-zinc-600">{label}</p>
-                <p className="text-sm font-medium text-gray-800 dark:text-zinc-200">{value}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          {/* Ticket form */}
-          <div className="rounded-xl border border-gray-200 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/80 p-5">
-            <div className="flex items-center gap-2 mb-5">
-              <MessageSquare size={16} className="text-blue-500" />
-              <h3 className="text-sm font-semibold text-gray-800 dark:text-zinc-200">Submit a Support Ticket</h3>
-            </div>
-
-            {submitted ? (
-              <div className="flex flex-col items-center py-10 text-center">
-                <div className="w-14 h-14 rounded-2xl bg-emerald-50 dark:bg-emerald-400/10 flex items-center justify-center mb-4">
-                  <CheckCircle size={28} className="text-emerald-500 dark:text-emerald-400" />
+    <div className="flex flex-col h-full overflow-hidden bg-[#f5f6fb] dark:bg-[#0c0e12]">
+      <TopNavbar title="Help & Support" subtitle="We're here to help you succeed" />
+      
+      <div className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-thin">
+        <div className="max-w-[1200px] mx-auto space-y-8">
+          
+          {/* Support Channels */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6" style={{ animation: 'fadeIn 0.5s ease-out 0.1s both' }}>
+            {[
+              { 
+                icon: Mail, 
+                title: 'Email Support', 
+                desc: 'Get support via email within 24 hours.', 
+                action: 'support@buizrocket.com',
+                color: 'from-[#6E3DFB] to-[#FF61BC]'
+              },
+              { 
+                icon: MessageSquare, 
+                title: 'Live Chat', 
+                desc: 'Chat with our support team in real-time.', 
+                action: 'Start Chat',
+                color: 'from-[#00D1FF] to-[#6E3DFB]'
+              },
+              { 
+                icon: Phone, 
+                title: 'Phone Support', 
+                desc: 'Call us directly for urgent matters.', 
+                action: '+91 1800-123-4567',
+                color: 'from-[#FFB800] to-[#FF61BC]'
+              }
+            ].map((method, i) => (
+              <div 
+                key={method.title} 
+                className="group relative bg-white/80 dark:bg-[#15171b]/80 backdrop-blur-2xl border border-white/40 dark:border-white/5 rounded-[2rem] p-6 shadow-[0_8px_40px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgb(0,0,0,0.2)] hover:shadow-[0_12px_50px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_12px_50px_rgb(0,0,0,0.3)] transition-all duration-300 transform hover:-translate-y-1"
+                style={{ animation: `scaleIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) ${0.15 + (i * 0.1)}s both` }}
+              >
+                <div className={`w-14 h-14 rounded-[1.25rem] bg-gradient-to-br ${method.color} flex items-center justify-center text-white mb-5 shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                  <method.icon size={24} strokeWidth={2.5} />
                 </div>
-                <h4 className="text-base font-semibold text-gray-800 dark:text-zinc-200 mb-2">Ticket Submitted!</h4>
-                <p className="text-sm text-gray-400 dark:text-zinc-500 mb-5 max-w-xs">Our support team will get back to you within 24 hours on your registered email.</p>
-                <Button variant="secondary" onClick={() => { setSubmitted(false); setForm({ subject: '', category: '', message: '' }) }}>
-                  Submit Another
-                </Button>
+                <h3 className="text-lg font-extrabold text-[#2c2f33] dark:text-white mb-2">{method.title}</h3>
+                <p className="text-sm font-medium text-[#595c60] dark:text-[#9b9da1] mb-6">{method.desc}</p>
+                <div className="pt-4 border-t border-[#e6e8ee] dark:border-zinc-800/80">
+                  <span className="text-sm font-bold text-[#6E3DFB] dark:text-[#a78bfa] hover:text-[#5b32d6] transition-colors cursor-pointer">{method.action}</span>
+                </div>
               </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <Input label="Subject" required value={form.subject} onChange={(e) => setForm({ ...form, subject: e.target.value })} placeholder="Brief description of your issue" />
-                <Select label="Category" required value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} options={categoryOptions} placeholder="Select category" />
-                <Textarea label="Message" required value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} placeholder="Describe your issue in detail..." />
-                <Button type="submit" loading={loading} icon={<Send size={14} />} className="w-full justify-center">
-                  Send Ticket
-                </Button>
-              </form>
-            )}
+            ))}
           </div>
 
-          {/* FAQs */}
-          <div className="rounded-xl border border-gray-200 dark:border-zinc-800/60 bg-white dark:bg-zinc-900/80 p-5">
-            <h3 className="text-sm font-semibold text-gray-800 dark:text-zinc-200 mb-4">Frequently Asked Questions</h3>
-            <div className="space-y-2">
-              {faqs.map((faq, i) => (
-                <div key={i} className="border border-gray-100 dark:border-zinc-800/60 rounded-xl overflow-hidden">
-                  <button
-                    id={`faq-${i}`}
-                    onClick={() => setOpenFaq(openFaq === i ? null : i)}
-                    className="w-full flex items-center justify-between px-4 py-3 text-sm text-gray-700 dark:text-zinc-300 hover:text-gray-900 dark:hover:text-zinc-100 hover:bg-gray-50 dark:hover:bg-zinc-800/30 transition-all text-left"
-                  >
-                    <span className="font-medium">{faq.q}</span>
-                    <span className={`text-gray-400 dark:text-zinc-600 transition-transform duration-200 flex-shrink-0 ml-3 ${openFaq === i ? 'rotate-180' : ''}`}>▾</span>
-                  </button>
-                  {openFaq === i && (
-                    <div className="px-4 pb-4 pt-1 border-t border-gray-50 dark:border-zinc-800/40">
-                      <p className="text-xs text-gray-400 dark:text-zinc-500 leading-relaxed">{faq.a}</p>
-                    </div>
-                  )}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8" style={{ animation: 'fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both' }}>
+            
+            {/* Submit Ticket Form */}
+            <div className="lg:col-span-2 bg-white/80 dark:bg-[#15171b]/80 backdrop-blur-2xl border border-white/40 dark:border-white/5 rounded-[2rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgb(0,0,0,0.2)] p-6 md:p-8 hover:shadow-[0_12px_50px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_12px_50px_rgb(0,0,0,0.3)] transition-all duration-300">
+              <div className="mb-6">
+                <h2 className="text-xl font-black text-[#2c2f33] dark:text-white tracking-tight mb-2">Submit a Ticket</h2>
+                <p className="text-sm font-medium text-[#9b9da1]">Describe your issue and our team will resolve it as quickly as possible.</p>
+              </div>
+              <form onSubmit={handleTicketSubmit} className="space-y-5">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <Input label="Your Name" placeholder="John Doe" required />
+                  <Input label="Email Address" type="email" placeholder="john@example.com" required />
                 </div>
-              ))}
+                <Input label="Subject" placeholder="Briefly describe your issue" required />
+                <Textarea label="Message" placeholder="Provide as much detail as possible..." rows={5} required />
+                <div className="pt-2">
+                  <Button type="submit" className="w-full md:w-auto px-8 py-3 rounded-2xl shadow-[0_4px_14px_0_rgb(110,61,251,0.39)] hover:shadow-[0_6px_20px_rgba(110,61,251,0.23)] hover:bg-[#5b32d6] font-bold text-[15px] flex items-center justify-center gap-2 transition-all">
+                    <Send size={18} strokeWidth={2.5} />
+                    Submit Request
+                  </Button>
+                </div>
+              </form>
             </div>
+
+            {/* FAQs / Quick Links */}
+            <div className="bg-white/80 dark:bg-[#15171b]/80 backdrop-blur-2xl border border-white/40 dark:border-white/5 rounded-[2rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgb(0,0,0,0.2)] p-6 md:p-8 flex flex-col hover:shadow-[0_12px_50px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_12px_50px_rgb(0,0,0,0.3)] transition-all duration-300">
+              <div className="mb-6">
+                <h2 className="text-xl font-black text-[#2c2f33] dark:text-white tracking-tight mb-2">Quick Resources</h2>
+                <p className="text-sm font-medium text-[#9b9da1]">Common answers at your fingertips.</p>
+              </div>
+              
+              <div className="space-y-4 flex-1">
+                {[
+                  'How to configure payment gateway?',
+                  'Understanding your payout cycle',
+                  'How to manage bulk inventory?',
+                  'Step-by-step shipping guide',
+                  'Customizing your storefront'
+                ].map((faq, i) => (
+                  <a 
+                    href="#faq" 
+                    key={i}
+                    className="flex justify-between items-center p-4 rounded-xl border border-[#e6e8ee] dark:border-zinc-800 bg-[#f5f6fb] dark:bg-zinc-900/50 hover:border-[#6E3DFB]/30 hover:bg-[#6E3DFB]/5 transition-all group"
+                  >
+                    <span className="text-sm font-bold text-[#595c60] dark:text-[#dadde4] group-hover:text-[#6E3DFB] transition-colors">{faq}</span>
+                    <ExternalLink size={14} className="text-[#9b9da1] group-hover:text-[#6E3DFB] transition-colors" />
+                  </a>
+                ))}
+              </div>
+
+              <div className="mt-8 pt-6 border-t border-[#e6e8ee] dark:border-zinc-800">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-[12px] bg-[#00D1FF]/10 flex items-center justify-center">
+                    <FileText size={18} className="text-[#00D1FF]" strokeWidth={2.5} />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-[#2c2f33] dark:text-white">Visit Help Center</h4>
+                    <p className="text-[12px] font-medium text-[#9b9da1]">Browse all articles</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>

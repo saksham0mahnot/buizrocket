@@ -1,11 +1,16 @@
 import { Outlet } from 'react-router-dom'
 import { Sidebar } from './Sidebar'
+import { Sidebar_Bottom } from './Sidebar_Bottom'
 import { Toaster } from 'react-hot-toast'
 
 export function DashboardLayout() {
   return (
     <div className="flex h-screen overflow-hidden bg-gray-50 dark:bg-zinc-950">
-      <Sidebar />
+      <aside className="w-64 h-screen flex flex-col bg-white dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-800/60 flex-shrink-0">
+        <Sidebar />
+        <div className="h-px bg-gray-200 dark:bg-zinc-800/60 mx-4 my-2" />
+        <Sidebar_Bottom />
+      </aside>
       <main className="flex-1 flex flex-col overflow-hidden">
         <Outlet />
       </main>

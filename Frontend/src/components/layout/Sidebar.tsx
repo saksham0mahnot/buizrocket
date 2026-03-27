@@ -10,6 +10,7 @@ import {
   Zap,
   LogOut,
   ChevronRight,
+  Wallet,
 } from 'lucide-react'
 import { cn } from '../../utils/cn'
 import { useAuthStore } from '../../store/authStore'
@@ -35,7 +36,7 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="w-64 h-screen flex flex-col bg-white dark:bg-zinc-950 border-r border-gray-200 dark:border-zinc-800/60 flex-shrink-0">
+    <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-zinc-950">
       {/* Logo */}
       <div className="flex items-center gap-3 px-5 py-5 border-b border-gray-200 dark:border-zinc-800/60">
         <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
@@ -78,24 +79,24 @@ export function Sidebar() {
 
       {/* User profile */}
       <div className="p-3 border-t border-gray-200 dark:border-zinc-800/60">
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-100 dark:bg-zinc-800/40 hover:bg-gray-200 dark:hover:bg-zinc-800/70 transition-colors group">
-          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50/50 dark:bg-zinc-900/40 hover:bg-gray-100 dark:hover:bg-zinc-800/60 transition-colors group">
+          <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-sm shadow-blue-500/20">
             {user ? getInitials(user.name) : 'U'}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium text-gray-800 dark:text-zinc-200 truncate">{user?.name}</p>
-            <p className="text-[10px] text-gray-400 dark:text-zinc-600 truncate">{user?.role === 'admin' ? 'Administrator' : 'Seller'}</p>
+            <p className="text-xs font-bold text-gray-800 dark:text-zinc-200 truncate leading-tight">{user?.name}</p>
+            <p className="text-[10px] text-gray-400 dark:text-zinc-600 truncate uppercase tracking-widest mt-0.5 font-medium">{user?.role === 'admin' ? 'Administrator' : 'Seller'}</p>
           </div>
           <button
             id="sidebar-logout-btn"
             onClick={handleLogout}
-            className="p-1.5 rounded-md text-gray-400 dark:text-zinc-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-400/10 transition-colors opacity-0 group-hover:opacity-100"
+            className="p-1.5 rounded-md text-gray-400 dark:text-zinc-600 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-400/10 transition-all ml-auto"
             title="Logout"
           >
-            <LogOut size={14} />
+            <LogOut size={14} strokeWidth={2.5} />
           </button>
         </div>
       </div>
-    </aside>
+    </div>
   )
 }

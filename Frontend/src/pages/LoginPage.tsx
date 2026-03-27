@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Eye, EyeOff, Zap, Lock, Mail } from 'lucide-react'
+import { Eye, EyeOff, Zap, Lock, Mail, ArrowRight } from 'lucide-react'
 import { useAuthStore } from '../store/authStore'
 import toast from 'react-hot-toast'
 
@@ -30,35 +30,45 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-zinc-950 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background glow */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-blue-500/6 dark:bg-blue-600/8 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 left-1/3 w-[400px] h-[400px] bg-violet-500/5 dark:bg-violet-600/6 rounded-full blur-3xl" />
+    <div className="min-h-screen bg-[#f5f6fb] dark:bg-[#0c0e12] flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Premium background mesh glow */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden h-full w-full">
+        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-[#6E3DFB]/20 dark:bg-[#6E3DFB]/10 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-pulse" style={{ animationDuration: '8s' }} />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-[#00D1FF]/20 dark:bg-[#00D1FF]/10 blur-[120px] mix-blend-multiply dark:mix-blend-screen animate-pulse" style={{ animationDuration: '10s', animationDelay: '2s' }} />
+        <div className="absolute top-[20%] right-[10%] w-[30vw] h-[30vw] rounded-full bg-[#FF61BC]/20 dark:bg-[#FF61BC]/10 blur-[100px] mix-blend-multiply dark:mix-blend-screen animate-pulse" style={{ animationDuration: '9s', animationDelay: '1s' }} />
       </div>
 
-      <div className="w-full max-w-sm relative z-10 animate-fade-in">
-        {/* Logo */}
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-violet-600 flex items-center justify-center shadow-xl shadow-blue-500/30 mb-4">
-            <Zap size={22} className="text-white" />
+      <div className="w-full max-w-md relative z-10" style={{ animation: 'fadeIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) both' }}>
+        {/* Logo and Greeting */}
+        <div className="flex flex-col items-center mb-10" style={{ animation: 'slideIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both' }}>
+          <div className="w-16 h-16 rounded-[1.5rem] bg-gradient-to-br from-[#6E3DFB] to-[#FF61BC] flex items-center justify-center shadow-[0_8px_32px_rgba(110,61,251,0.4)] dark:shadow-[0_8px_32px_rgba(110,61,251,0.2)] mb-6 ring-4 ring-white/50 dark:ring-white/10">
+            <Zap size={28} className="text-white drop-shadow-md" strokeWidth={2.5} />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-zinc-100 tracking-tight">Buizrocket</h1>
-          <p className="text-sm text-gray-500 dark:text-zinc-500 mt-1">Seller Dashboard</p>
+          <h1 className="text-3xl font-extrabold text-[#2c2f33] dark:text-white tracking-tight text-center">
+            Welcome to <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#6E3DFB] to-[#00D1FF]">Buizrocket</span>
+          </h1>
+          <p className="text-sm font-medium text-[#595c60] dark:text-[#9b9da1] mt-2 text-center max-w-[280px]">
+            Sign in to access your premium seller dashboard
+          </p>
         </div>
 
-        {/* Card */}
-        <div className="rounded-2xl border border-gray-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/80 backdrop-blur-sm p-7 shadow-xl dark:shadow-2xl">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-zinc-100 mb-1">Sign in</h2>
-          <p className="text-sm text-gray-500 dark:text-zinc-500 mb-6">Enter your credentials to access the dashboard</p>
+        {/* Glassmorphic Login Card */}
+        <div 
+          className="rounded-[2.5rem] border border-white/40 dark:border-white/5 bg-white/70 dark:bg-[#15171b]/80 backdrop-blur-2xl p-8 sm:p-10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] relative overflow-hidden"
+          style={{ animation: 'slideIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both' }}
+        >
+          {/* Subtle inner top highlight */}
+          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/50 dark:via-white/10 to-transparent" />
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label htmlFor="login-email" className="block text-sm font-medium text-gray-700 dark:text-zinc-400 mb-1.5">
-                Email address
+          <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
+            <div className="space-y-1.5" style={{ animation: 'fadeIn 0.8s ease-out 0.3s both' }}>
+              <label htmlFor="login-email" className="block text-[13px] font-bold text-[#595c60] dark:text-[#9b9da1] ml-1">
+                Email Address
               </label>
-              <div className="relative">
-                <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-600" />
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Mail size={18} className="text-[#9b9da1] group-focus-within:text-[#6E3DFB] transition-colors" />
+                </div>
                 <input
                   id="login-email"
                   type="email"
@@ -66,17 +76,22 @@ export function LoginPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@buizrocket.com"
                   autoComplete="email"
-                  className="w-full pl-9 pr-3 py-2.5 text-sm bg-gray-50 dark:bg-zinc-800/60 border border-gray-200 dark:border-zinc-700 rounded-lg text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                  className="w-full pl-11 pr-4 py-3.5 text-sm bg-white/50 dark:bg-[#0c0e12]/50 border border-[#e6e8ee] dark:border-zinc-800 rounded-2xl text-[#2c2f33] dark:text-white placeholder-[#9b9da1] dark:placeholder-[#595c60] focus:outline-none focus:border-[#6E3DFB] focus:ring-4 focus:ring-[#6E3DFB]/10 transition-all font-medium shadow-inner"
                 />
               </div>
             </div>
 
-            <div>
-              <label htmlFor="login-password" className="block text-sm font-medium text-gray-700 dark:text-zinc-400 mb-1.5">
-                Password
-              </label>
-              <div className="relative">
-                <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-600" />
+            <div className="space-y-1.5" style={{ animation: 'fadeIn 0.8s ease-out 0.4s both' }}>
+              <div className="flex justify-between items-center ml-1">
+                <label htmlFor="login-password" className="block text-[13px] font-bold text-[#595c60] dark:text-[#9b9da1]">
+                  Password
+                </label>
+                <a href="#" className="text-[12px] font-bold text-[#6E3DFB] hover:text-[#FF61BC] transition-colors">Forgot?</a>
+              </div>
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Lock size={18} className="text-[#9b9da1] group-focus-within:text-[#6E3DFB] transition-colors" />
+                </div>
                 <input
                   id="login-password"
                   type={showPassword ? 'text' : 'password'}
@@ -84,15 +99,15 @@ export function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   autoComplete="current-password"
-                  className="w-full pl-9 pr-10 py-2.5 text-sm bg-gray-50 dark:bg-zinc-800/60 border border-gray-200 dark:border-zinc-700 rounded-lg text-gray-900 dark:text-zinc-100 placeholder-gray-400 dark:placeholder-zinc-600 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                  className="w-full pl-11 pr-12 py-3.5 text-sm bg-white/50 dark:bg-[#0c0e12]/50 border border-[#e6e8ee] dark:border-zinc-800 rounded-2xl text-[#2c2f33] dark:text-white placeholder-[#9b9da1] dark:placeholder-[#595c60] focus:outline-none focus:border-[#6E3DFB] focus:ring-4 focus:ring-[#6E3DFB]/10 transition-all font-medium shadow-inner"
                 />
                 <button
                   type="button"
                   id="toggle-password-visibility"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 dark:text-zinc-600 hover:text-gray-700 dark:hover:text-zinc-300 transition-colors"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-[#9b9da1] hover:text-[#595c60] dark:hover:text-[#dadde4] transition-colors"
                 >
-                  {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
             </div>
@@ -101,40 +116,54 @@ export function LoginPage() {
               id="login-submit-btn"
               type="submit"
               disabled={loading}
-              className="w-full py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-500 rounded-lg transition-all duration-200 shadow-lg shadow-blue-600/25 disabled:opacity-50 disabled:cursor-not-allowed active:scale-[0.98] mt-2"
+              style={{ animation: 'scaleIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.5s both' }}
+              className="group relative w-full py-4 text-sm font-bold text-white bg-[#6E3DFB] hover:bg-[#5511e3] rounded-2xl transition-all duration-300 shadow-[0_10px_25px_rgba(110,61,251,0.3)] disabled:opacity-70 disabled:cursor-not-allowed hover:shadow-[0_15px_35px_rgba(110,61,251,0.4)] hover:-translate-y-0.5 mt-4 overflow-hidden"
             >
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                  </svg>
-                  Signing in...
-                </span>
-              ) : (
-                'Sign in'
-              )}
+              {/* Shine effect */}
+              <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full transition-all duration-[1.5s]" />
+              
+              <span className="relative flex items-center justify-center gap-2">
+                {loading ? (
+                  <>
+                    <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    Authenticating...
+                  </>
+                ) : (
+                  <>
+                    Sign in to Workspace
+                    <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
+              </span>
             </button>
           </form>
 
           {/* Demo credentials */}
-          <div className="mt-5 p-3.5 rounded-lg bg-gray-50 dark:bg-zinc-800/50 border border-gray-200 dark:border-zinc-700/50">
-            <p className="text-xs font-medium text-gray-500 dark:text-zinc-500 mb-2">Demo credentials</p>
-            <div className="space-y-1.5 text-xs">
-              <div className="flex justify-between">
-                <span className="text-gray-400 dark:text-zinc-600">Admin:</span>
-                <span className="font-mono text-gray-600 dark:text-zinc-400">admin@buizrocket.com / admin123</span>
+          <div className="mt-8 p-4 rounded-xl relative overflow-hidden group" style={{ animation: 'fadeIn 0.8s ease-out 0.6s both' }}>
+            <div className="absolute inset-0 bg-gradient-to-r from-[#6E3DFB]/5 to-[#00D1FF]/5 dark:from-[#6E3DFB]/10 dark:to-[#00D1FF]/10 pointer-events-none" />
+            <div className="absolute inset-0 border border-[#6E3DFB]/10 dark:border-[#6E3DFB]/20 rounded-xl pointer-events-none" />
+            <h4 className="text-[11px] font-bold text-[#6E3DFB] uppercase tracking-wider mb-3 relative z-10 flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#6E3DFB] animate-pulse" />
+              Demo Access
+            </h4>
+            <div className="space-y-2 relative z-10">
+              <div className="flex justify-between items-center text-[13px] bg-white/40 dark:bg-black/20 p-2 rounded-lg backdrop-blur-sm border border-white/50 dark:border-white/5">
+                <span className="font-semibold text-[#595c60] dark:text-[#dadde4]">Admin</span>
+                <span className="font-mono font-bold text-[#2c2f33] dark:text-white select-all">admin@buizrocket.com <span className="text-[#9b9da1] mx-1">/</span> admin123</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-gray-400 dark:text-zinc-600">Seller:</span>
-                <span className="font-mono text-gray-600 dark:text-zinc-400">seller@buizrocket.com / seller123</span>
+              <div className="flex justify-between items-center text-[13px] bg-white/40 dark:bg-black/20 p-2 rounded-lg backdrop-blur-sm border border-white/50 dark:border-white/5">
+                <span className="font-semibold text-[#595c60] dark:text-[#dadde4]">Seller</span>
+                <span className="font-mono font-bold text-[#2c2f33] dark:text-white select-all">seller@buizrocket.com <span className="text-[#9b9da1] mx-1">/</span> seller123</span>
               </div>
             </div>
           </div>
         </div>
 
-        <p className="text-center text-xs text-gray-400 dark:text-zinc-700 mt-6">
-          © 2024 Buizrocket. All rights reserved.
+        <p className="text-center text-[12px] font-semibold text-[#9b9da1] mt-8" style={{ animation: 'fadeIn 0.8s ease-out 0.7s both' }}>
+          © 2024 Buizrocket Atelier. All rights reserved.
         </p>
       </div>
     </div>

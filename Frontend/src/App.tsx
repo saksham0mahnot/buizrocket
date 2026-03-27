@@ -11,6 +11,7 @@ import { UsersPage } from './pages/UsersPage'
 import { GrowthPage } from './pages/GrowthPage'
 import { LearnPage } from './pages/LearnPage'
 import { SupportPage } from './pages/SupportPage'
+import { AccountsPage } from './pages/AccountsPage'
 
 function App() {
   const { isDark } = useAuthStore()
@@ -39,6 +40,7 @@ function App() {
           <Route path="growth" element={<GrowthPage />} />
           <Route path="learn" element={<LearnPage />} />
           <Route path="support" element={<SupportPage />} />
+          <Route path="accounts" element={<AccountsPage />} />
         </Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
