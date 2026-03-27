@@ -2,6 +2,23 @@ export type OrderStatus = 'Pending' | 'Shipped' | 'Delivered' | 'Cancelled'
 export type UserStatus = 'Approved' | 'Suspended' | 'Pending'
 export type UserRole = 'admin' | 'seller'
 
+export type PaymentMethod = 'UPI' | 'Net Banking' | 'Credit Card' | 'Debit Card' | 'Cash on Delivery' | 'Wallet'
+export type PaymentStatus = 'Paid' | 'Pending' | 'Failed' | 'Refunded'
+
+export interface PaymentInfo {
+  method: PaymentMethod
+  status: PaymentStatus
+  transactionId: string
+  gateway: string
+  paidAt?: string
+  bank?: string
+  upiId?: string
+  cardLast4?: string
+  refundedAt?: string
+  refundReason?: string
+  timeline: { event: string; time: string }[]
+}
+
 export interface Order {
   id: string
   orderNo: string
@@ -10,6 +27,7 @@ export interface Order {
   products: { name: string; qty: number; price: number }[]
   amount: number
   status: OrderStatus
+  payment: PaymentInfo
   shippingDetails: {
     address: string
     city: string
@@ -19,8 +37,17 @@ export interface Order {
     trackingId?: string
     carrier?: string
   }
+  invoiceUrl?: string
   createdAt: string
   updatedAt: string
+}
+
+export type PriceCategory = 'wholesaler' | 'retailer' | 'guest'
+
+export interface ProductPricing {
+  wholesaler?: number
+  retailer?: number
+  guest?: number
 }
 
 export interface Product {
@@ -29,13 +56,18 @@ export interface Product {
   category: string
   subcategory: string
   brand: string
-  price: number
+  model?: string
+  price: number          // base/fallback price
+  pricing: ProductPricing // role-based prices
   mrp?: number
   tax: number
   quantity: number
   description: string
   bulletPoints: string[]
   images: string[]
+  priceCategory?: PriceCategory  // which pricing to default-show
+  featured: boolean
+  featuredPosition?: number
   totalOrders: number
   costUpdatedAt: string
   createdAt: string

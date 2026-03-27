@@ -1,8 +1,8 @@
-import { useState, useMemo } from 'react'
-import { Search, Eye, Pencil, ChevronUp, ChevronDown, Truck, Package, Phone } from 'lucide-react'
+import { useState, useMemo, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Search, Eye, ChevronUp, ChevronDown, Truck, Package, Phone, Download, Upload, Edit2, Save, X, CheckCircle2, CreditCard } from 'lucide-react'
 import { TopNavbar } from '../components/layout/TopNavbar'
 import { Modal } from '../components/ui/Modal'
-import { Select } from '../components/ui/Input'
 import { Button } from '../components/ui/Button'
 import { mockOrders } from '../services/mockData'
 import { formatCurrency, formatDate } from '../utils/cn'
@@ -12,13 +12,118 @@ import toast from 'react-hot-toast'
 type SortKey = 'orderNo' | 'userName' | 'amount' | 'status' | 'createdAt'
 type SortDir = 'asc' | 'desc'
 
-const STATUS_OPTIONS: { value: OrderStatus | 'All'; label: string }[] = [
-  { value: 'All', label: 'All Statuses' },
+const STATUS_OPTIONS: { value: OrderStatus; label: string }[] = [
   { value: 'Pending', label: 'Pending' },
   { value: 'Shipped', label: 'Shipped' },
   { value: 'Delivered', label: 'Delivered' },
   { value: 'Cancelled', label: 'Cancelled' },
 ]
+
+const STATUS_FILTER_OPTIONS: { value: OrderStatus | 'All'; label: string }[] = [
+  { value: 'All', label: 'All Statuses' },
+  ...STATUS_OPTIONS,
+]
+
+const statusStyle: Record<OrderStatus, string> = {
+  Pending: 'bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 ring-1 ring-inset ring-amber-500/20',
+  Shipped: 'bg-[#00D1FF]/10 text-[#00647b] dark:text-[#37d4ff] ring-1 ring-inset ring-[#00D1FF]/20',
+  Delivered: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 ring-1 ring-inset ring-emerald-600/20',
+  Cancelled: 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 ring-1 ring-inset ring-rose-600/20',
+}
+
+function printOrderReceipt(order: Order) {
+  const items = order.products
+    .map(
+      (p) => `
+      <tr>
+        <td style="padding:8px 12px;border-bottom:1px solid #eee;">${p.name}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center;">×${p.qty}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:right;">₹${(p.price * p.qty).toLocaleString('en-IN')}</td>
+      </tr>`
+    )
+    .join('')
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8"/>
+  <title>Invoice – ${order.orderNo}</title>
+  <style>
+    body { font-family: 'Segoe UI', sans-serif; color:#1a1a2e; padding:40px; max-width:720px; margin:auto; }
+    h1 { font-size:22px; font-weight:800; letter-spacing:-0.5px; margin:0; }
+    .badge { display:inline-block; padding:4px 12px; border-radius:999px; font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; background:#f0ebff; color:#6E3DFB; }
+    .divider { border:none; border-top:1px solid #eee; margin:20px 0; }
+    table { width:100%; border-collapse:collapse; font-size:14px; }
+    th { text-align:left; padding:8px 12px; font-size:11px; text-transform:uppercase; letter-spacing:.08em; color:#888; border-bottom:2px solid #eee; }
+    th:last-child, td:last-child { text-align:right; }
+    .total-row td { font-weight:800; font-size:16px; border-top:2px solid #eee; padding-top:12px; }
+    .label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#888; margin-bottom:4px; }
+    .value { font-size:14px; font-weight:600; }
+    .grid { display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px; }
+    @media print { body { padding:24px; } }
+  </style>
+</head>
+<body>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;">
+    <div>
+      <h1>TAX INVOICE</h1>
+      <div style="margin-top:8px;" class="badge">${order.status}</div>
+    </div>
+    <div style="text-align:right;">
+      <div class="label">Order No.</div>
+      <div class="value" style="font-size:18px;font-weight:800;">${order.orderNo}</div>
+      <div style="font-size:12px;color:#888;margin-top:4px;">${formatDate(order.createdAt)}</div>
+    </div>
+  </div>
+
+  <hr class="divider"/>
+
+  <div class="grid">
+    <div>
+      <div class="label">Bill To</div>
+      <div class="value">${order.userName}</div>
+      <div style="font-size:13px;color:#555;">${order.userEmail}</div>
+    </div>
+    <div>
+      <div class="label">Ship To</div>
+      <div class="value" style="font-size:13px;">${order.shippingDetails.address}</div>
+      <div style="font-size:13px;color:#555;">${order.shippingDetails.city}, ${order.shippingDetails.state} – ${order.shippingDetails.pincode}</div>
+      <div style="font-size:13px;color:#555;">${order.shippingDetails.phone}</div>
+    </div>
+  </div>
+
+  ${order.shippingDetails.trackingId ? `
+  <div style="margin-bottom:20px;padding:10px 14px;background:#e8f9ff;border-radius:8px;font-size:13px;">
+    <strong>Tracking:</strong> ${order.shippingDetails.carrier ?? ''} – ${order.shippingDetails.trackingId}
+  </div>` : ''}
+
+  <table>
+    <thead><tr>
+      <th>Item</th>
+      <th style="text-align:center;">Qty</th>
+      <th style="text-align:right;">Amount</th>
+    </tr></thead>
+    <tbody>${items}</tbody>
+    <tfoot>
+      <tr class="total-row">
+        <td colspan="2">Total Amount</td>
+        <td>${formatCurrency(order.amount)}</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <hr class="divider"/>
+  <p style="font-size:12px;color:#aaa;text-align:center;">Thank you for your order! — Buizrocket Seller Portal</p>
+</body>
+</html>`
+
+  const win = window.open('', '_blank')
+  if (!win) return
+  win.document.write(html)
+  win.document.close()
+  win.focus()
+  setTimeout(() => { win.print() }, 300)
+}
 
 export function OrdersPage() {
   const [orders, setOrders] = useState<Order[]>(mockOrders)
@@ -27,8 +132,15 @@ export function OrdersPage() {
   const [sortKey, setSortKey] = useState<SortKey>('createdAt')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
   const [viewOrder, setViewOrder] = useState<Order | null>(null)
-  const [editOrder, setEditOrder] = useState<Order | null>(null)
-  const [newStatus, setNewStatus] = useState<OrderStatus>('Pending')
+  const navigate = useNavigate()
+
+  // Invoice upload state: orderId -> filename
+  const [invoiceFiles, setInvoiceFiles] = useState<Record<string, string>>({})
+  const invoiceInputRef = useRef<HTMLInputElement>(null)
+
+  // Shipping edit state
+  const [editingShipping, setEditingShipping] = useState(false)
+  const [shippingDraft, setShippingDraft] = useState<Order['shippingDetails'] | null>(null)
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'))
@@ -54,13 +166,44 @@ export function OrdersPage() {
     return result
   }, [orders, search, statusFilter, sortKey, sortDir])
 
-  const handleUpdateStatus = () => {
-    if (!editOrder) return
+  const handleInlineStatusChange = (orderId: string, newStatus: OrderStatus) => {
     setOrders((prev) =>
-      prev.map((o) => o.id === editOrder.id ? { ...o, status: newStatus, updatedAt: new Date().toISOString() } : o)
+      prev.map((o) => o.id === orderId ? { ...o, status: newStatus, updatedAt: new Date().toISOString() } : o)
     )
-    setEditOrder(null)
-    toast.success(`Order ${editOrder.orderNo} updated to ${newStatus}`)
+    // Keep viewOrder in sync if it's the same order
+    setViewOrder((prev) => prev?.id === orderId ? { ...prev, status: newStatus } : prev)
+    toast.success(`Status updated to ${newStatus}`)
+  }
+
+  const handleInvoiceUpload = (e: React.ChangeEvent<HTMLInputElement>, orderId: string) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setInvoiceFiles((prev) => ({ ...prev, [orderId]: file.name }))
+      toast.success(`Invoice "${file.name}" uploaded!`)
+    }
+  }
+
+  const handleSaveShipping = () => {
+    if (!viewOrder || !shippingDraft) return
+    setOrders((prev) =>
+      prev.map((o) => o.id === viewOrder.id ? { ...o, shippingDetails: shippingDraft, updatedAt: new Date().toISOString() } : o)
+    )
+    setViewOrder((prev) => prev ? { ...prev, shippingDetails: shippingDraft } : prev)
+    setEditingShipping(false)
+    setShippingDraft(null)
+    toast.success('Shipping details updated!')
+  }
+
+  const openViewModal = (order: Order) => {
+    setViewOrder(order)
+    setEditingShipping(false)
+    setShippingDraft(null)
+  }
+
+  const closeViewModal = () => {
+    setViewOrder(null)
+    setEditingShipping(false)
+    setShippingDraft(null)
   }
 
   const SortIcon = ({ k }: { k: SortKey }) => (
@@ -76,7 +219,7 @@ export function OrdersPage() {
       <div className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-thin">
         <div className="max-w-[1600px] mx-auto space-y-8">
 
-          {/* Filters & Actions */}
+          {/* Filters */}
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between" style={{ animation: 'fadeIn 0.5s ease-out 0.1s both' }}>
             <div className="flex gap-4 w-full sm:w-auto">
               <div className="relative flex-1 sm:w-72 group">
@@ -97,28 +240,25 @@ export function OrdersPage() {
                   onChange={(e) => setStatusFilter(e.target.value as OrderStatus | 'All')}
                   className="pl-4 pr-10 py-2.5 text-sm font-bold bg-white/70 dark:bg-[#15171b]/80 backdrop-blur-md border border-white/40 dark:border-white/5 rounded-2xl text-[#595c60] dark:text-[#dadde4] focus:outline-none focus:border-[#6E3DFB] focus:ring-4 focus:ring-[#6E3DFB]/10 shadow-sm appearance-none transition-all cursor-pointer hover:text-[#2c2f33] dark:hover:text-white"
                 >
-                  {STATUS_OPTIONS.map((o) => (
+                  {STATUS_FILTER_OPTIONS.map((o) => (
                     <option key={o.value} value={o.value} className="bg-white dark:bg-[#15171b]">{o.label}</option>
                   ))}
                 </select>
-                <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#9b9da1] group-hover:text-[#6E3DFB] transition-colors" />
+                <ChevronDown size={14} className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#9b9da1]" />
               </div>
             </div>
-
-            <div className="flex gap-2">
-              <span className="px-4 py-2.5 text-sm font-bold bg-[#6E3DFB]/10 text-[#6E3DFB] rounded-2xl border border-[#6E3DFB]/20 shadow-sm hidden sm:block">
-                Last 30 Days
-              </span>
-            </div>
+            <span className="px-4 py-2.5 text-sm font-bold bg-[#6E3DFB]/10 text-[#6E3DFB] rounded-2xl border border-[#6E3DFB]/20 shadow-sm hidden sm:block">
+              Last 30 Days
+            </span>
           </div>
 
-          {/* Table Container */}
+          {/* Table */}
           <div
             className="bg-white/80 dark:bg-[#15171b]/80 backdrop-blur-2xl border border-white/40 dark:border-white/5 rounded-[2rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgb(0,0,0,0.2)] overflow-hidden"
             style={{ animation: 'fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both' }}
           >
             <div className="overflow-x-auto p-2 md:p-4">
-              <table className="w-full text-left border-collapse min-w-[800px]">
+              <table className="w-full text-left border-collapse min-w-[860px]">
                 <thead>
                   <tr>
                     {[
@@ -183,37 +323,40 @@ export function OrdersPage() {
                           </div>
                         </td>
                         <td className="px-5 py-4 text-[14px] font-black tracking-tight text-[#2c2f33] dark:text-white">{formatCurrency(order.amount)}</td>
+
+                        {/* Inline Status Dropdown */}
                         <td className="px-5 py-4">
-                          <span className={`inline-flex items-center px-3 py-1.5 rounded-full text-[11px] font-bold uppercase tracking-widest
-                            ${order.status === 'Delivered' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400 ring-1 ring-inset ring-emerald-600/20' : ''}
-
-                            ${order.status === 'Shipped' ? 'bg-[#00D1FF]/10 text-[#00647b] dark:text-[#37d4ff] ring-1 ring-inset ring-[#00D1FF]/20' : ''}
-                            ${order.status === 'Pending' ? 'bg-[#f5f6fb] text-[#595c60] dark:bg-zinc-800 dark:text-[#dadde4] ring-1 ring-inset ring-[#9b9da1]/20' : ''}
-                            ${order.status === 'Cancelled' ? 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 ring-1 ring-inset ring-rose-600/20' : ''}
-                          `}>
-                            {order.status === 'Pending' && <span className="w-1.5 h-1.5 rounded-full bg-[#595c60] dark:bg-[#dadde4] mr-2 animate-pulse" />}
-
-                            {order.status}
-                          </span>
+                          <select
+                            value={order.status}
+                            onChange={(e) => handleInlineStatusChange(order.id, e.target.value as OrderStatus)}
+                            className={`text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border-0 outline-none cursor-pointer appearance-none transition-all focus:ring-2 focus:ring-[#6E3DFB]/30 ${statusStyle[order.status]}`}
+                          >
+                            {STATUS_OPTIONS.map((s) => (
+                              <option key={s.value} value={s.value} className="bg-white dark:bg-zinc-900 text-gray-800 dark:text-white normal-case font-semibold text-sm tracking-normal">
+                                {s.label}
+                              </option>
+                            ))}
+                          </select>
                         </td>
+
                         <td className="px-5 py-4 text-[13px] font-semibold text-[#9b9da1]">{formatDate(order.createdAt)}</td>
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-2">
                             <button
                               id={`view-order-${order.id}`}
-                              onClick={() => setViewOrder(order)}
+                              onClick={() => openViewModal(order)}
                               className="p-2 rounded-xl text-[#9b9da1] hover:text-[#00D1FF] hover:bg-[#00D1FF]/10 transition-all shadow-sm ring-1 ring-inset ring-[#e6e8ee] dark:ring-white/5 bg-white dark:bg-zinc-800"
                               title="View Details"
                             >
                               <Eye size={16} strokeWidth={2.5} />
                             </button>
                             <button
-                              id={`edit-order-${order.id}`}
-                              onClick={() => { setEditOrder(order); setNewStatus(order.status) }}
+                              id={`payment-order-${order.id}`}
+                              onClick={() => navigate('/payments')}
                               className="p-2 rounded-xl text-[#9b9da1] hover:text-[#6E3DFB] hover:bg-[#6E3DFB]/10 transition-all shadow-sm ring-1 ring-inset ring-[#e6e8ee] dark:ring-white/5 bg-white dark:bg-zinc-800"
-                              title="Update Status"
+                              title="View Payment"
                             >
-                              <Pencil size={16} strokeWidth={2.5} />
+                              <CreditCard size={16} strokeWidth={2.5} />
                             </button>
                           </div>
                         </td>
@@ -228,9 +371,11 @@ export function OrdersPage() {
       </div>
 
       {/* View Order Modal */}
-      <Modal open={!!viewOrder} onClose={() => setViewOrder(null)} title={`Order ${viewOrder?.orderNo}`} description={`Placed on ${viewOrder ? formatDate(viewOrder.createdAt) : ''}`} size="lg">
+      <Modal open={!!viewOrder} onClose={closeViewModal} title={`Order ${viewOrder?.orderNo}`} description={`Placed on ${viewOrder ? formatDate(viewOrder.createdAt) : ''}`} size="lg">
         {viewOrder && (
-          <div className="space-y-6">
+          <div className="space-y-5">
+
+            {/* Customer + Amount */}
             <div className="grid grid-cols-2 gap-4">
               <div className="p-5 rounded-2xl bg-[#f5f6fb] dark:bg-zinc-800/50 border border-[#e6e8ee] dark:border-zinc-700/50 shadow-inner">
                 <p className="text-[11px] font-bold text-[#9b9da1] uppercase tracking-widest mb-1.5">Customer</p>
@@ -242,9 +387,25 @@ export function OrdersPage() {
                   <p className="text-[11px] font-bold text-[#6E3DFB] uppercase tracking-widest mb-1">Total Amount</p>
                   <p className="text-2xl font-black text-[#6E3DFB] tracking-tight">{formatCurrency(viewOrder.amount)}</p>
                 </div>
-                <div className="mt-2 self-start"><span className="px-3 py-1 bg-white dark:bg-black/40 rounded-full text-xs font-bold ring-1 ring-inset ring-[#e6e8ee] dark:ring-white/10 uppercase tracking-widest">{viewOrder.status}</span></div>
+                {/* Status change inside view modal */}
+                <div className="mt-3">
+                  <p className="text-[10px] font-bold text-[#9b9da1] uppercase tracking-widest mb-1.5">Order Status</p>
+                  <select
+                    value={viewOrder.status}
+                    onChange={(e) => handleInlineStatusChange(viewOrder.id, e.target.value as OrderStatus)}
+                    className={`text-[11px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-full border-0 outline-none cursor-pointer appearance-none transition-all focus:ring-2 focus:ring-[#6E3DFB]/30 ${statusStyle[viewOrder.status]}`}
+                  >
+                    {STATUS_OPTIONS.map((s) => (
+                      <option key={s.value} value={s.value} className="bg-white dark:bg-zinc-900 text-gray-800 dark:text-white normal-case font-semibold text-sm tracking-normal">
+                        {s.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
+
+            {/* Ordered Items */}
             <div>
               <p className="text-[11px] font-bold text-[#9b9da1] uppercase tracking-widest mb-3">Ordered Items</p>
               <div className="space-y-2">
@@ -264,44 +425,145 @@ export function OrdersPage() {
                 ))}
               </div>
             </div>
+
+            {/* Shipping Details */}
             <div className="p-5 rounded-2xl bg-gradient-to-br from-[#f5f6fb] to-white dark:from-zinc-900 dark:to-zinc-800/80 border border-[#e6e8ee] dark:border-zinc-700/50 shadow-sm">
-              <div className="flex items-center gap-2.5 mb-4 border-b border-[#e6e8ee] dark:border-zinc-800 pb-3">
-                <Truck size={16} className="text-[#00D1FF]" strokeWidth={2.5} />
-                <p className="text-[12px] font-bold text-[#595c60] dark:text-[#9b9da1] uppercase tracking-widest">Shipping Details</p>
-              </div>
-              <div className="text-[14px] font-medium text-[#595c60] dark:text-[#dadde4] space-y-1.5 ml-1">
-                <p>{viewOrder.shippingDetails.address}</p>
-                <p>{viewOrder.shippingDetails.city}, {viewOrder.shippingDetails.state} — <span className="font-mono font-bold text-[#2c2f33] dark:text-white">{viewOrder.shippingDetails.pincode}</span></p>
-                <p className="text-[#9b9da1] flex items-center gap-2 mt-2">
-                  <Phone size={12} /> {viewOrder.shippingDetails.phone}
-                </p>
-                {viewOrder.shippingDetails.trackingId && (
-                  <div className="mt-4 inline-block bg-[#00D1FF]/10 border border-[#00D1FF]/20 px-3 py-1.5 rounded-lg">
-                    <p className="text-[#00647b] dark:text-[#37d4ff] font-mono text-[12px] font-bold">
-                      {viewOrder.shippingDetails.carrier}: {viewOrder.shippingDetails.trackingId}
-                    </p>
+              <div className="flex items-center justify-between mb-4 border-b border-[#e6e8ee] dark:border-zinc-800 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <Truck size={16} className="text-[#00D1FF]" strokeWidth={2.5} />
+                  <p className="text-[12px] font-bold text-[#595c60] dark:text-[#9b9da1] uppercase tracking-widest">Shipping Details</p>
+                </div>
+                {!editingShipping ? (
+                  <button
+                    onClick={() => { setEditingShipping(true); setShippingDraft({ ...viewOrder.shippingDetails }) }}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold text-[#6E3DFB] hover:bg-[#6E3DFB]/10 transition-all"
+                  >
+                    <Edit2 size={12} strokeWidth={2.5} /> Edit
+                  </button>
+                ) : (
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleSaveShipping}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-500/10 transition-all"
+                    >
+                      <Save size={12} strokeWidth={2.5} /> Save
+                    </button>
+                    <button
+                      onClick={() => { setEditingShipping(false); setShippingDraft(null) }}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-bold text-[#9b9da1] hover:bg-gray-100 dark:hover:bg-zinc-800 transition-all"
+                    >
+                      <X size={12} strokeWidth={2.5} /> Cancel
+                    </button>
                   </div>
                 )}
               </div>
-            </div>
-          </div>
-        )}
-      </Modal>
 
-      {/* Edit Status Modal */}
-      <Modal open={!!editOrder} onClose={() => setEditOrder(null)} title="Update Order Status" description={editOrder?.orderNo} size="sm">
-        {editOrder && (
-          <div className="space-y-6">
-            <Select
-              label="New Status"
-              value={newStatus}
-              onChange={(e) => setNewStatus(e.target.value as OrderStatus)}
-              options={STATUS_OPTIONS.filter(o => o.value !== 'All').map(o => ({ value: o.value, label: o.label }))}
-            />
-            <div className="flex gap-3 justify-end pt-4 border-t border-[#e6e8ee] dark:border-zinc-800">
-              <Button variant="secondary" onClick={() => setEditOrder(null)}>Cancel</Button>
-              <Button onClick={handleUpdateStatus}>Update Status</Button>
+              {!editingShipping ? (
+                <div className="text-[14px] font-medium text-[#595c60] dark:text-[#dadde4] space-y-1.5 ml-1">
+                  <p>{viewOrder.shippingDetails.address}</p>
+                  <p>{viewOrder.shippingDetails.city}, {viewOrder.shippingDetails.state} — <span className="font-mono font-bold text-[#2c2f33] dark:text-white">{viewOrder.shippingDetails.pincode}</span></p>
+                  <p className="text-[#9b9da1] flex items-center gap-2 mt-2">
+                    <Phone size={12} /> {viewOrder.shippingDetails.phone}
+                  </p>
+                  {viewOrder.shippingDetails.trackingId && (
+                    <div className="mt-4 inline-block bg-[#00D1FF]/10 border border-[#00D1FF]/20 px-3 py-1.5 rounded-lg">
+                      <p className="text-[#00647b] dark:text-[#37d4ff] font-mono text-[12px] font-bold">
+                        {viewOrder.shippingDetails.carrier}: {viewOrder.shippingDetails.trackingId}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                shippingDraft && (
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { label: 'Address', key: 'address' as const, colSpan: true },
+                      { label: 'City', key: 'city' as const },
+                      { label: 'State', key: 'state' as const },
+                      { label: 'Pincode', key: 'pincode' as const },
+                      { label: 'Phone', key: 'phone' as const },
+                      { label: 'Carrier', key: 'carrier' as const },
+                      { label: 'Tracking ID', key: 'trackingId' as const },
+                    ].map(({ label, key, colSpan }) => (
+                      <div key={key} className={colSpan ? 'col-span-2' : ''}>
+                        <label className="block text-[11px] font-bold text-[#9b9da1] uppercase tracking-widest mb-1.5">{label}</label>
+                        <input
+                          type="text"
+                          value={(shippingDraft[key] as string) ?? ''}
+                          onChange={(e) => setShippingDraft((d) => d ? { ...d, [key]: e.target.value } : d)}
+                          className="w-full px-3 py-2 text-sm font-medium bg-white dark:bg-zinc-900 border border-[#e6e8ee] dark:border-zinc-700 rounded-xl text-[#2c2f33] dark:text-white focus:outline-none focus:border-[#6E3DFB] focus:ring-2 focus:ring-[#6E3DFB]/20 transition-all"
+                          placeholder={label}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )
+              )}
             </div>
+
+            {/* Invoice Upload */}
+            <div className="p-5 rounded-2xl bg-gradient-to-br from-[#f5f6fb] to-white dark:from-zinc-900 dark:to-zinc-800/80 border border-[#e6e8ee] dark:border-zinc-700/50 shadow-sm">
+              <div className="flex items-center gap-2.5 mb-4 border-b border-[#e6e8ee] dark:border-zinc-800 pb-3">
+                <Upload size={15} className="text-[#6E3DFB]" strokeWidth={2.5} />
+                <p className="text-[12px] font-bold text-[#595c60] dark:text-[#9b9da1] uppercase tracking-widest">Invoice</p>
+              </div>
+              <input
+                ref={invoiceInputRef}
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                className="hidden"
+                onChange={(e) => handleInvoiceUpload(e, viewOrder.id)}
+              />
+              {invoiceFiles[viewOrder.id] ? (
+                <div className="flex items-center justify-between p-3 rounded-xl bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20">
+                  <div className="flex items-center gap-2.5">
+                    <CheckCircle2 size={16} className="text-emerald-500 flex-shrink-0" strokeWidth={2.5} />
+                    <span className="text-[13px] font-bold text-emerald-700 dark:text-emerald-400 truncate max-w-[260px]">{invoiceFiles[viewOrder.id]}</span>
+                  </div>
+                  <button
+                    onClick={() => invoiceInputRef.current?.click()}
+                    className="text-[11px] font-bold text-[#6E3DFB] hover:underline ml-4 flex-shrink-0"
+                  >
+                    Replace
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => invoiceInputRef.current?.click()}
+                  className="w-full flex flex-col items-center justify-center gap-2 py-6 rounded-xl border-2 border-dashed border-[#d5d7e0] dark:border-zinc-700 hover:border-[#6E3DFB] hover:bg-[#6E3DFB]/5 transition-all group cursor-pointer"
+                >
+                  <Upload size={22} className="text-[#9b9da1] group-hover:text-[#6E3DFB] transition-colors" strokeWidth={1.5} />
+                  <div className="text-center">
+                    <p className="text-[13px] font-bold text-[#595c60] dark:text-[#dadde4] group-hover:text-[#6E3DFB] transition-colors">Click to upload invoice</p>
+                    <p className="text-[11px] text-[#9b9da1] mt-0.5">PDF, JPG, or PNG supported</p>
+                  </div>
+                </button>
+              )}
+            </div>
+
+            {/* Download PDF Button */}
+            <div className="pt-2 border-t border-[#e6e8ee] dark:border-zinc-800 flex justify-end gap-3">
+              <Button
+                variant="secondary"
+                onClick={() => { closeViewModal(); navigate('/payments') }}
+                className="flex items-center gap-2 rounded-2xl px-5 text-[#6E3DFB] border-[#6E3DFB]/20 hover:bg-[#6E3DFB]/10"
+              >
+                <CreditCard size={15} strokeWidth={2.5} />
+                View Payment
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => printOrderReceipt(viewOrder)}
+                className="flex items-center gap-2 rounded-2xl px-5"
+              >
+                <Download size={15} strokeWidth={2.5} />
+                Download PDF
+              </Button>
+              <Button onClick={closeViewModal} className="rounded-2xl px-5">
+                Close
+              </Button>
+            </div>
+
           </div>
         )}
       </Modal>
