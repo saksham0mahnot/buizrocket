@@ -30,7 +30,6 @@ const resources = [
     icon: FileText,
     color: 'from-[#6E3DFB] to-[#FF61BC]',
     items: [
-      { title: 'GST Filing for Sellers', description: 'A step-by-step guide to GST compliance', tag: 'Guide', time: '20 min' },
       { title: 'Return & Refund Policy', description: 'Understand platform return policies', tag: 'Article', time: '5 min' },
       { title: 'Prohibited Items List', description: 'What you cannot sell on Buizrocket', tag: 'Article', time: '3 min' },
     ],
@@ -49,9 +48,9 @@ export function LearnPage() {
       <TopNavbar title="Seller University" subtitle="Resources to help you grow on Buizrocket" />
       <div className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-thin">
         <div className="max-w-[1400px] mx-auto space-y-8">
-          
+
           {/* Hero banner */}
-          <div 
+          <div
             className="relative overflow-hidden rounded-[2rem] bg-gradient-to-r from-[#15171b] via-[#1a1c23] to-[#15171b] p-8 md:p-12 shadow-[0_20px_60px_rgb(0,0,0,0.3)]"
             style={{ animation: 'fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both' }}
           >
@@ -59,7 +58,7 @@ export function LearnPage() {
               <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:radial-gradient(ellipse_70%_70%_at_50%_50%,#000_20%,transparent_100%)] opacity-30" />
               <div className="absolute -top-[150%] -left-[50%] w-[1000px] h-[1000px] bg-[radial-gradient(circle,rgba(110,61,251,0.15)_0%,transparent_60%)] animate-slow-spin mix-blend-screen" />
             </div>
-            
+
             <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
               <div className="max-w-xl">
                 <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/10 mb-6">
@@ -94,7 +93,7 @@ export function LearnPage() {
                       <p className="text-sm font-medium text-[#9b9da1]">{section.desc}</p>
                     </div>
                   </div>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {section.items.map((item, i) => (
                       <div
@@ -114,7 +113,7 @@ export function LearnPage() {
                         </div>
                         <div className="flex items-center gap-2 pt-4 border-t border-[#e6e8ee] dark:border-zinc-800">
                           <div className="flex gap-1.5 opacity-50">
-                            {[1,2,3].map(dot => <div key={dot} className={`w-1 h-1 rounded-full bg-current ${dot === 1 ? 'opacity-100' : dot === 2 ? 'opacity-50' : 'opacity-25'}`} />)}
+                            {[1, 2, 3].map(dot => <div key={dot} className={`w-1 h-1 rounded-full bg-current ${dot === 1 ? 'opacity-100' : dot === 2 ? 'opacity-50' : 'opacity-25'}`} />)}
                           </div>
                           <p className="text-[12px] font-bold text-[#9b9da1] uppercase tracking-widest">{item.time} read</p>
                         </div>
@@ -125,7 +124,7 @@ export function LearnPage() {
               )
             })}
           </div>
-          
+
         </div>
       </div>
     </div>

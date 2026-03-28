@@ -389,7 +389,7 @@ export const mockUsers: SellerUser[] = [
     address: '45, Nehru Nagar, Delhi - 110065',
     gst: '07ABCDE1234F1Z5',
     status: 'Approved',
-    role: 'seller',
+    role: 'wholeseller',
     createdAt: '2023-03-15T00:00:00Z',
   },
   {
@@ -401,7 +401,7 @@ export const mockUsers: SellerUser[] = [
     address: '22, Anna Salai, Chennai - 600002',
     gst: '33ABCDE5678G2Z6',
     status: 'Approved',
-    role: 'seller',
+    role: 'retailer',
     createdAt: '2023-05-20T00:00:00Z',
   },
   {
@@ -410,10 +410,8 @@ export const mockUsers: SellerUser[] = [
     userId: 'SELL004',
     phone: '+91 65432 00004',
     email: 'suresh@electrozone.in',
-    address: '8, FC Road, Pune - 411004',
-    gst: '27FGHIJ9012H3Z7',
     status: 'Suspended',
-    role: 'seller',
+    role: 'guest',
     createdAt: '2023-07-10T00:00:00Z',
   },
   {
@@ -422,10 +420,9 @@ export const mockUsers: SellerUser[] = [
     userId: 'SELL005',
     phone: '+91 54321 00005',
     email: 'nisha@shopmax.in',
-    address: '33, Indira Nagar, Lucknow - 226016',
-    gst: '09KLMNO3456I4Z8',
     status: 'Pending',
-    role: 'seller',
+    role: 'sub-admin',
+    permissions: ['manage_catalog', 'manage_orders', 'view_reports'],
     createdAt: '2024-01-05T00:00:00Z',
   },
 ]

@@ -8,43 +8,43 @@ export function SupportPage() {
   const handleTicketSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     toast.success('Your ticket has been submitted. We will get back to you soon.')
-    ;(e.target as HTMLFormElement).reset()
+      ; (e.target as HTMLFormElement).reset()
   }
 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-[#f5f6fb] dark:bg-[#0c0e12]">
       <TopNavbar title="Help & Support" subtitle="We're here to help you succeed" />
-      
+
       <div className="flex-1 overflow-y-auto p-4 md:p-8 scrollbar-thin">
         <div className="max-w-[1200px] mx-auto space-y-8">
-          
+
           {/* Support Channels */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6" style={{ animation: 'fadeIn 0.5s ease-out 0.1s both' }}>
             {[
-              { 
-                icon: Mail, 
-                title: 'Email Support', 
-                desc: 'Get support via email within 24 hours.', 
+              {
+                icon: Mail,
+                title: 'Email Support',
+                desc: 'Get support via email within 24 hours.',
                 action: 'support@buizrocket.com',
                 color: 'from-[#6E3DFB] to-[#FF61BC]'
               },
-              { 
-                icon: MessageSquare, 
-                title: 'Live Chat', 
-                desc: 'Chat with our support team in real-time.', 
+              {
+                icon: MessageSquare,
+                title: 'Chat',
+                desc: 'Chat with our support team in real-time.',
                 action: 'Start Chat',
                 color: 'from-[#00D1FF] to-[#6E3DFB]'
               },
-              { 
-                icon: Phone, 
-                title: 'Phone Support', 
-                desc: 'Call us directly for urgent matters.', 
+              {
+                icon: Phone,
+                title: 'Phone Support',
+                desc: 'Call us directly for urgent matters.',
                 action: '+91 1800-123-4567',
                 color: 'from-[#FFB800] to-[#FF61BC]'
               }
             ].map((method, i) => (
-              <div 
-                key={method.title} 
+              <div
+                key={method.title}
                 className="group relative bg-white/80 dark:bg-[#15171b]/80 backdrop-blur-2xl border border-white/40 dark:border-white/5 rounded-[2rem] p-6 shadow-[0_8px_40px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgb(0,0,0,0.2)] hover:shadow-[0_12px_50px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_12px_50px_rgb(0,0,0,0.3)] transition-all duration-300 transform hover:-translate-y-1"
                 style={{ animation: `scaleIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) ${0.15 + (i * 0.1)}s both` }}
               >
@@ -61,7 +61,7 @@ export function SupportPage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8" style={{ animation: 'fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.4s both' }}>
-            
+
             {/* Submit Ticket Form */}
             <div className="lg:col-span-2 bg-white/80 dark:bg-[#15171b]/80 backdrop-blur-2xl border border-white/40 dark:border-white/5 rounded-[2rem] shadow-[0_8px_40px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_40px_rgb(0,0,0,0.2)] p-6 md:p-8 hover:shadow-[0_12px_50px_rgb(0,0,0,0.08)] dark:hover:shadow-[0_12px_50px_rgb(0,0,0,0.3)] transition-all duration-300">
               <div className="mb-6">
@@ -90,7 +90,7 @@ export function SupportPage() {
                 <h2 className="text-xl font-black text-[#2c2f33] dark:text-white tracking-tight mb-2">Quick Resources</h2>
                 <p className="text-sm font-medium text-[#9b9da1]">Common answers at your fingertips.</p>
               </div>
-              
+
               <div className="space-y-4 flex-1">
                 {[
                   'How to configure payment gateway?',
@@ -99,8 +99,8 @@ export function SupportPage() {
                   'Step-by-step shipping guide',
                   'Customizing your storefront'
                 ].map((faq, i) => (
-                  <a 
-                    href="#faq" 
+                  <a
+                    href="#faq"
                     key={i}
                     className="flex justify-between items-center p-4 rounded-xl border border-[#e6e8ee] dark:border-zinc-800 bg-[#f5f6fb] dark:bg-zinc-900/50 hover:border-[#6E3DFB]/30 hover:bg-[#6E3DFB]/5 transition-all group"
                   >

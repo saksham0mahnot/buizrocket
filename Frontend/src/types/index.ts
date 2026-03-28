@@ -1,6 +1,14 @@
 export type OrderStatus = 'Pending' | 'Shipped' | 'Delivered' | 'Cancelled'
 export type UserStatus = 'Approved' | 'Suspended' | 'Pending'
-export type UserRole = 'admin' | 'seller'
+export type UserRole = 'admin' | 'sub-admin' | 'wholeseller' | 'retailer' | 'guest'
+
+export type AdminPermission =
+  | 'manage_users'
+  | 'manage_catalog'
+  | 'manage_orders'
+  | 'manage_accounts'
+  | 'manage_settings'
+  | 'view_reports'
 
 export type PaymentMethod = 'UPI' | 'Net Banking' | 'Credit Card' | 'Debit Card' | 'Cash on Delivery' | 'Wallet'
 export type PaymentStatus = 'Paid' | 'Pending' | 'Failed' | 'Refunded'
@@ -81,10 +89,11 @@ export interface SellerUser {
   userId: string
   phone: string
   email: string
-  address: string
-  gst: string
+  address?: string
+  gst?: string
   status: UserStatus
   role: UserRole
+  permissions?: AdminPermission[]  // only relevant for sub-admin
   createdAt: string
   password?: string
 }
