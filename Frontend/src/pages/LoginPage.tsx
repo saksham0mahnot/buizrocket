@@ -5,27 +5,31 @@ import { useAuthStore } from '../store/authStore'
 import toast from 'react-hot-toast'
 
 export function LoginPage() {
+  // const [email, setEmail] = useState(import.meta.env.VITE_DEFAULT_EMAIL || '')
+  // const [password, setPassword] = useState(import.meta.env.VITE_DEFAULT_PASSWORD || '')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
   const { login } = useAuthStore()
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email || !password) {
-      toast.error('Please enter your credentials')
-      return
-    }
+    setError('')
+    if (!email) return setError('Please enter your email id')
+    if (!password) return setError('Please enter your password')
+
     setLoading(true)
-    const success = await login(email, password)
-    setLoading(false)
-    if (success) {
+    try {
+      await login(email, password)
       toast.success('Welcome back!')
       navigate('/dashboard')
-    } else {
-      toast.error('Invalid email or password')
+    } catch (err: any) {
+      setError(err.message || 'Authentication failed')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -53,7 +57,7 @@ export function LoginPage() {
         </div>
 
         {/* Glassmorphic Login Card */}
-        <div 
+        <div
           className="rounded-[2.5rem] border border-white/40 dark:border-white/5 bg-white/70 dark:bg-[#15171b]/80 backdrop-blur-2xl p-8 sm:p-10 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] relative overflow-hidden"
           style={{ animation: 'slideIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.2s both' }}
         >
@@ -121,7 +125,7 @@ export function LoginPage() {
             >
               {/* Shine effect */}
               <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-full transition-all duration-[1.5s]" />
-              
+
               <span className="relative flex items-center justify-center gap-2">
                 {loading ? (
                   <>
@@ -141,29 +145,24 @@ export function LoginPage() {
             </button>
           </form>
 
-          {/* Demo credentials */}
-          <div className="mt-8 p-4 rounded-xl relative overflow-hidden group" style={{ animation: 'fadeIn 0.8s ease-out 0.6s both' }}>
-            <div className="absolute inset-0 bg-gradient-to-r from-[#6E3DFB]/5 to-[#00D1FF]/5 dark:from-[#6E3DFB]/10 dark:to-[#00D1FF]/10 pointer-events-none" />
-            <div className="absolute inset-0 border border-[#6E3DFB]/10 dark:border-[#6E3DFB]/20 rounded-xl pointer-events-none" />
-            <h4 className="text-[11px] font-bold text-[#6E3DFB] uppercase tracking-wider mb-3 relative z-10 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#6E3DFB] animate-pulse" />
-              Demo Access
-            </h4>
-            <div className="space-y-2 relative z-10">
-              <div className="flex justify-between items-center text-[13px] bg-white/40 dark:bg-black/20 p-2 rounded-lg backdrop-blur-sm border border-white/50 dark:border-white/5">
-                <span className="font-semibold text-[#595c60] dark:text-[#dadde4]">Admin</span>
-                <span className="font-mono font-bold text-[#2c2f33] dark:text-white select-all">admin@buizrocket.com <span className="text-[#9b9da1] mx-1">/</span> admin123</span>
-              </div>
-              <div className="flex justify-between items-center text-[13px] bg-white/40 dark:bg-black/20 p-2 rounded-lg backdrop-blur-sm border border-white/50 dark:border-white/5">
-                <span className="font-semibold text-[#595c60] dark:text-[#dadde4]">Seller</span>
-                <span className="font-mono font-bold text-[#2c2f33] dark:text-white select-all">seller@buizrocket.com <span className="text-[#9b9da1] mx-1">/</span> seller123</span>
-              </div>
+          {/* Error Message */}
+          {error && (
+            <div
+              className="mt-6 p-4 rounded-xl border relative overflow-hidden group border-red-500/20 bg-red-500/10 dark:bg-red-500/5 text-center"
+              style={{ animation: 'fadeIn 0.4s ease-out both' }}
+            >
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-red-500/30 to-transparent" />
+              <p className="text-[13px] font-semibold text-red-600 dark:text-red-400 relative z-10 flex items-center justify-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                {error}
+              </p>
             </div>
-          </div>
+          )}
+
         </div>
 
         <p className="text-center text-[12px] font-semibold text-[#9b9da1] mt-8" style={{ animation: 'fadeIn 0.8s ease-out 0.7s both' }}>
-          © 2024 Buizrocket Atelier. All rights reserved.
+          © {new Date().getFullYear()} Buizrocket Atelier. All rights reserved.
         </p>
       </div>
     </div>

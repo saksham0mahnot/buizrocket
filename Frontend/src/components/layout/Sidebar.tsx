@@ -55,7 +55,7 @@ export function Sidebar({ width = 256 }: SidebarProps) {
         {!collapsed && (
           <div className="min-w-0">
             <span className="text-sm font-bold text-gray-900 dark:text-zinc-100 tracking-tight truncate block">Buizrocket</span>
-            <p className="text-[10px] text-gray-400 dark:text-zinc-600 uppercase tracking-widest">Seller Portal</p>
+            <p className="text-[10px] text-gray-400 dark:text-zinc-600 uppercase tracking-widest"> Business Portal</p>
           </div>
         )}
       </div>
